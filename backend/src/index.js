@@ -20,8 +20,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://full-stack-chat-app-0gzn.onrender.com",
+    origin: [
+      "https://full-stack-chat-app-0gzn.onrender.com",
+      "http://localhost:3000",
+      "http://localhost:5173"
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
