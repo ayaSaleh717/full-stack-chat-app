@@ -90,14 +90,22 @@ export const updateProfile = async (req, res) => {
     const { profilePic } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    let updateData = {};
+    
+    if (profilePic === "") {
+      // If profilePic is an empty string, remove the profile picture
+      updateData.profilePic = "";
+    } else if (profilePic) {
+      // If a new profile picture is provided, upload it to Cloudinary
+      const uploadResponse = await cloudinary.uploader.upload(profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
+    } else {
+      return res.status(400).json({ message: "Invalid request" });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      updateData,
       { new: true }
     );
 

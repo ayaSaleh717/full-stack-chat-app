@@ -23,7 +23,12 @@ const ProfilePage = () => {
   const handleDeleteProfilePic = async () => {
     if (window.confirm("Are you sure you want to remove your profile picture?")) {
       setSelectedImg(null);
-      await updateProfile({ profilePic: "" });
+      try {
+        await updateProfile({ profilePic: "" });
+      } catch (error) {
+        console.error("Failed to delete profile picture:", error);
+        // toast.error("Failed to remove profile picture");
+      }
     }
   };
 
