@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Camera, Mail, User } from "lucide-react";
+import { Camera, Mail, User, Trash2 } from "lucide-react";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -11,7 +11,6 @@ const ProfilePage = () => {
     if (!file) return;
 
     const reader = new FileReader();
-
     reader.readAsDataURL(file);
 
     reader.onload = async () => {
@@ -19,6 +18,13 @@ const ProfilePage = () => {
       setSelectedImg(base64Image);
       await updateProfile({ profilePic: base64Image });
     };
+  };
+
+  const handleDeleteProfilePic = async () => {
+    if (window.confirm("Are you sure you want to remove your profile picture?")) {
+      setSelectedImg(null);
+      await updateProfile({ profilePic: "" });
+    }
   };
 
   return (
@@ -31,37 +37,47 @@ const ProfilePage = () => {
           </div>
 
           {/* avatar upload section */}
-
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
                 src={selectedImg || authUser.profilePic || "/avatar.png"}
                 alt="Profile"
-                className="size-32 rounded-full object-cover border-4 "
+                className="size-32 rounded-full object-cover border-4"
               />
-              <label
-                htmlFor="avatar-upload"
-                className={`
-                  absolute bottom-0 right-0 
-                  bg-base-content hover:scale-105
-                  p-2 rounded-full cursor-pointer 
-                  transition-all duration-200
-                  ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
-                `}
-              >
-                <Camera className="w-5 h-5 text-base-200" />
-                <input
-                  type="file"
-                  id="avatar-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isUpdatingProfile}
-                />
-              </label>
+              <div className="absolute bottom-0 right-0 flex gap-2">
+                <label
+                  htmlFor="avatar-upload"
+                  className={`
+                    bg-base-content hover:scale-105
+                    p-2 rounded-full cursor-pointer 
+                    transition-all duration-200
+                    ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
+                  `}
+                >
+                  <Camera className="w-5 h-5 text-base-200" />
+                  <input
+                    type="file"
+                    id="avatar-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUpdatingProfile}
+                  />
+                </label>
+                {(selectedImg || authUser.profilePic) && (
+                  <button
+                    onClick={handleDeleteProfilePic}
+                    className="bg-error hover:bg-error/90 hover:scale-105 p-2 rounded-full transition-all duration-200"
+                    disabled={isUpdatingProfile}
+                    title="Remove profile picture"
+                  >
+                    <Trash2 className="w-5 h-5 text-base-200" />
+                  </button>
+                )}
+              </div>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
+              {isUpdatingProfile ? "Updating..." : "Click the camera icon to update your photo"}
             </p>
           </div>
 
